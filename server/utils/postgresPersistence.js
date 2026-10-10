@@ -1,5 +1,7 @@
 import pg from "pg";
 import db from "../db.js";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 const enabled =
   process.env.PERSISTENCE_MODE === "postgres-sync" &&
@@ -46,6 +48,15 @@ function sqliteValue(value) {
 }
 
 async function ensurePostgresSchema(client) {
+  // Initialize any missing PostgreSQL tables first.
+  const schemaPath = fileURLToPath(
+    new URL("../schema.postgres.sql", import.meta.url)
+  );
+
+  const schemaSql = await readFile(schemaPath, "utf8");
+  await client.query(schemaSql);
+
+  // Continue with the existing schema updates.
   await client.query(
     "ALTER TABLE production_run_items ADD COLUMN IF NOT EXISTS stock_before DOUBLE PRECISION",
   );
