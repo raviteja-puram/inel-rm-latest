@@ -53,5 +53,5 @@ app.get("/{*path}", (_req, res) => {
 startDailyRiskEmailJob();
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`INEL RM running on http://localhost:${PORT}`);
+  console.log(`INEL RM running on port ${PORT}`);
 });
